@@ -1,7 +1,24 @@
+use rand::prelude::ThreadRng;
+use rand::random;
+
 #[derive(Copy, Clone, Debug)]
 pub struct Point {
     pub x: f64,
     pub y: f64,
+}
+
+impl Point {
+    pub fn circle_rand(center_x: f64, center_y: f64, max_rad: f64) -> Point {
+        let rand: f64 = random();
+        let max_diameter = max_rad * 2.0;
+
+        let dx = max_diameter * (0.5 - rand);
+        let dy = max_diameter * (0.5 - rand);
+
+        let x = center_x + dx;
+        let y = center_y + dy;
+        Point { x, y }
+    }
 }
 
 pub fn point(x: f64, y: f64) -> Point { Point { x, y } }
@@ -60,4 +77,3 @@ impl Dist for Point {
         dx * dx + dy * dy
     }
 }
-
