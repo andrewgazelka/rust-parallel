@@ -6,7 +6,7 @@ Goal reduce within-cluster sum of squares = varaince
 use rand::prelude::ThreadRng;
 use rand::seq::IteratorRandom;
 
-use crate::points::{Closest, Dist, Mean, Point};
+use crate::points::{Closest, Mean, Point};
 
 pub trait KMeans {
     fn group(&self, points: &[Point], group_count: usize) -> Vec<Vec<Point>>;
