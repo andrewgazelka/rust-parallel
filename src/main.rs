@@ -1,19 +1,38 @@
-use itertools::Itertools;
+use std::cmp::{max, min};
 
-use crate::par_poly::calculate;
-use crate::pref_sum_mod::pref_sum;
+// use itertools::Itertools;
+// use rand::Rng;
+
+// use crate::par_poly::calculate;
+// use crate::pref_sum_mod::pref_sum;
 
 mod k_means;
 mod points;
 mod pref_sum_mod;
 mod par_poly;
+mod sort;
 
 fn main() {
-    // // let mut from = vec![1, 2, -1, 4, -1, 6, -1, 8];
-    // let mut from = (1..16).collect_vec();
-    // pref_sum(&mut from, 4);
-    // println!("{:?}", from);
-    let coeff = &mut [4.0, 5.0, 6.0, 7.0];
-    let res = calculate(coeff, 3.0);
-    println!("result {}", res);
+
+    // let pow = 3;
+    // let n = 2 << pow;
+    // let mut rng = rand::thread_rng();
+    //
+    // let rand_vec: Vec<i32> = (0..n).map(|_| rng.gen_range(0..32)).collect();
+    //
+    // let mut vecs = vec![rand_vec];
+    //
+    // for _ in 0..(pow + 1) {
+    //     let mut vecs_new = Vec::new();
+    //     for vec in vecs {
+    //         let (a, b) = bitonic(&vec);
+    //         vecs_new.push(a);
+    //         vecs_new.push(b);
+    //     }
+    //     vecs = vecs_new;
+    // }
+
+
+    // let res = vecs.iter().flatten().collect_vec();
+    // println!("{:?}", vecs);
 }
