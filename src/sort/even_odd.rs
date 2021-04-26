@@ -3,6 +3,50 @@
 use rayon::prelude::{ParallelIterator, ParallelSliceMut};
 
 use crate::sort::utils::is_pow_2;
+use crate::sort::Sorter;
+
+pub struct OddEvenMergeSort;
+
+impl Sorter for OddEvenMergeSort {
+    type T = i32;
+    fn sort(&self, arr: &mut [Self::T]) {
+        odd_even_mergesort(arr);
+    }
+}
+
+/// Apply a parallel odd-even mergesort.
+fn odd_even_mergesort(array: &mut [i32]) {
+
+    // we assert that we have perfect splits (array is power of 2). This algorithm requires perfect splits.
+    assert!(is_pow_2(array.len()));
+
+    sort_pairs_of_2(array);
+
+
+    // the current size of the arrays we will merge together. If this is greater than half the length of the array
+    // we will not be able to merge
+    let mut merge_size = 2;
+
+    let half_len = array.len();
+    while merge_size < half_len {
+
+        // we need to grab chunks twice the size of the arrays we will merge
+        let chunk_size = merge_size * 2;
+
+        array.par_chunks_mut(chunk_size).for_each(|input| {
+            // we split the input in two to get the two arrays we need to merge
+            let (first_half, second_half) = split(input);
+            let res = o_emerge(first_half, second_half);
+
+            // this sets all the values of `input` to be that of res
+            input.clone_from_slice(&res);
+        });
+
+        // we consecutively merge larger and larger arrays
+        merge_size *= 2;
+    }
+}
+
 
 /// returns 0th, 2nd, 4th, ... elements
 /// - Equivalent to `E(A)`
@@ -70,40 +114,6 @@ fn split(input: &[i32]) -> (&[i32], &[i32]) {
     let half_len = len / 2;
     assert_eq!(half_len * 2, len); // perfect split
     (&input[..half_len], &input[half_len..])
-}
-
-
-/// Apply a parallel odd-even mergesort.
-fn odd_even_mergesort(array: &mut [i32]) {
-
-    // we assert that we have perfect splits (array is power of 2). This algorithm requires perfect splits.
-    assert!(is_pow_2(array.len()));
-
-    sort_pairs_of_2(array);
-
-
-    // the current size of the arrays we will merge together. If this is greater than half the length of the array
-    // we will not be able to merge
-    let mut merge_size = 2;
-
-    let half_len = array.len();
-    while merge_size < half_len {
-
-        // we need to grab chunks twice the size of the arrays we will merge
-        let chunk_size = merge_size * 2;
-
-        array.par_chunks_mut(chunk_size).for_each(|input| {
-            // we split the input in two to get the two arrays we need to merge
-            let (first_half, second_half) = split(input);
-            let res = o_emerge(first_half, second_half);
-
-            // this sets all the values of `input` to be that of res
-            input.clone_from_slice(&res);
-        });
-
-        // we consecutively merge larger and larger arrays
-        merge_size *= 2;
-    }
 }
 
 #[cfg(test)]
