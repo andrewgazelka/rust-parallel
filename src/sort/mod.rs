@@ -4,5 +4,5 @@ pub mod bitonic;
 
 trait Sorter {
     type T;
-    fn sort(&self, arr: &mut [Self::T]);
+    fn sort(&self, arr: &mut [Self::T], log: bool);
 }

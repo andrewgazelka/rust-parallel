@@ -10,18 +10,28 @@ pub struct OddEvenMergeSort;
 
 impl Sorter for OddEvenMergeSort {
     type T = i32;
-    fn sort(&self, arr: &mut [Self::T]) {
-        odd_even_mergesort(arr);
+    fn sort(&self, arr: &mut [Self::T], log: bool) {
+        odd_even_mergesort(arr, log);
     }
 }
 
 /// Apply a parallel odd-even mergesort.
-fn odd_even_mergesort(array: &mut [i32]) {
+fn odd_even_mergesort(array: &mut [i32], log: bool) {
 
     // we assert that we have perfect splits (array is power of 2). This algorithm requires perfect splits.
     assert!(is_pow_2(array.len()));
 
+    if log {
+        println!("input {:?}", array);
+        println!()
+    }
+
     sort_pairs_of_2(array, Greater);
+
+    if log {
+        println!("sort pairs of 2 {:?}", array);
+        println!()
+    }
 
 
     // the current size of the arrays we will merge together. If this is greater than half the length of the array
@@ -37,7 +47,7 @@ fn odd_even_mergesort(array: &mut [i32]) {
         array.par_chunks_mut(chunk_size).for_each(|input| {
             // we split the input in two to get the two arrays we need to merge
             let (first_half, second_half) = split(input);
-            let res = o_emerge(first_half, second_half);
+            let res = dbg!(o_emerge(first_half, second_half));
 
             // this sets all the values of `input` to be that of res
             input.clone_from_slice(&res);
@@ -46,6 +56,7 @@ fn odd_even_mergesort(array: &mut [i32]) {
         // we consecutively merge larger and larger arrays
         merge_size *= 2;
     }
+
 }
 
 
@@ -80,8 +91,8 @@ fn o_emerge(a: &[i32], b: &[i32]) -> Vec<i32> {
         return vec![first, second];
     }
 
-    let c = o_emerge(&left_sample(a), &right_sample(b));
-    let d = o_emerge(&right_sample(a), &left_sample(b));
+    let c = dbg!(o_emerge(&left_sample(a), &right_sample(b)));
+    let d = dbg!(o_emerge(&right_sample(a), &left_sample(b)));
 
     let mut sorted = Vec::with_capacity(2 * n);
     for i in 0..n {
@@ -134,7 +145,15 @@ mod tests {
     #[test]
     fn merge_sort_works() {
         let mut arr = [1, 1, 43, 5, 6, 62, 7, 7];
-        odd_even_mergesort(&mut arr);
+        odd_even_mergesort(&mut arr, false);
+        assert!(is_sorted(&arr));
+    }
+
+
+    #[test]
+    fn homework() {
+        let mut arr = [3, 10, 1, 11, 30, 18, 8, 20];
+        odd_even_mergesort(&mut arr, true);
         assert!(is_sorted(&arr));
     }
 }

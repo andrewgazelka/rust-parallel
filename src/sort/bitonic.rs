@@ -10,22 +10,49 @@ struct BitonicSorter;
 impl Sorter for BitonicSorter {
     type T = i32;
 
-    fn sort(&self, arr: &mut [Self::T]) {
+    fn sort(&self, arr: &mut [Self::T], log: bool) {
         assert!(is_pow_2(arr.len()));
+
+        if log {
+            println!("input {:?}", arr);
+        }
 
         // phase 1
         bitonic_4_seq(arr);
+
+        if log {
+            println!();
+            println!("PHASE 1");
+            println!("4-sequences {:?}", arr);
+            println!();
+            println!("PHASE 2");
+        }
 
         // phase 2
         let mut stride = arr.len() / 4;
         while stride >= 1 {
             bitonic_merge(arr, stride);
+
+            if log {
+                println!("bitonic_merge stride {}", stride);
+                println!("result {:?}", arr);
+            }
+
             stride /= 2;
+        }
+
+        if log {
+            println!();
+            println!("PHASE 3");
         }
 
         let mut stride = arr.len() / 2;
         while stride >= 1 {
             cmp_exchange(arr, stride);
+            if log {
+                println!("cmp_exchange stride {}", stride);
+                println!("result {:?}", arr);
+            }
             stride /= 2;
         }
     }
@@ -110,7 +137,7 @@ mod tests {
     #[test]
     fn lecture_one_shot() {
         let arr = &mut vec![7, 6, 2, 4, 5, 3, 8, 1];
-        BitonicSorter.sort(arr);
+        BitonicSorter.sort(arr, false);
         assert_eq!(arr, &vec![1, 2, 3, 4, 5, 6, 7, 8])
     }
 
@@ -118,9 +145,16 @@ mod tests {
     #[test]
     fn random_vec() {
         let mut arr: Vec<i32> = (0..16).map(|_| random()).collect();
-        BitonicSorter.sort(&mut arr);
+        BitonicSorter.sort(&mut arr, false);
         println!("{:?}", arr);
         assert!(is_sorted(&arr));
 
+    }
+
+    #[test]
+    fn homework() {
+        let mut arr = vec![3, 10, 1, 11, 30, 18, 8, 20];
+        BitonicSorter.sort(&mut arr, true);
+        assert!(is_sorted(&arr));
     }
 }
