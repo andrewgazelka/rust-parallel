@@ -2,8 +2,9 @@
 
 use rayon::prelude::{ParallelIterator, ParallelSliceMut};
 
-use crate::sort::utils::is_pow_2;
+use crate::sort::utils::{is_pow_2, split, sort_pair, sort_pairs_of_2};
 use crate::sort::Sorter;
+use crate::sort::utils::SortType::Greater;
 
 pub struct OddEvenMergeSort;
 
@@ -20,7 +21,7 @@ fn odd_even_mergesort(array: &mut [i32]) {
     // we assert that we have perfect splits (array is power of 2). This algorithm requires perfect splits.
     assert!(is_pow_2(array.len()));
 
-    sort_pairs_of_2(array);
+    sort_pairs_of_2(array, Greater);
 
 
     // the current size of the arrays we will merge together. If this is greater than half the length of the array
@@ -75,7 +76,7 @@ fn o_emerge(a: &[i32], b: &[i32]) -> Vec<i32> {
     if n == 1 {
         let mut first = a[0];
         let mut second = b[0];
-        sort_pair(&mut first, &mut second);
+        sort_pair(&mut first, Greater, &mut second);
         return vec![first, second];
     }
 
@@ -86,34 +87,12 @@ fn o_emerge(a: &[i32], b: &[i32]) -> Vec<i32> {
     for i in 0..n {
         let mut first = c[i];
         let mut second = d[i];
-        sort_pair(&mut first, &mut second);
+        sort_pair(&mut first, Greater, &mut second);
         sorted.push(first);
         sorted.push(second);
     }
 
     sorted
-}
-
-fn sort_pair(a: &mut i32, b: &mut i32) {
-    if a > b {
-        std::mem::swap(a, b);
-    }
-}
-
-/// sort pairs of 2. This is done in parallel (one thread per chunk of 2). It *should* be an O(1) operation
-fn sort_pairs_of_2(array: &mut [i32]) {
-    array.par_chunks_mut(2).for_each(|input| {
-        if let [a, b] = input {
-            sort_pair(a, b);
-        } else { panic!("chunk is not of size 2") }
-    });
-}
-
-fn split(input: &[i32]) -> (&[i32], &[i32]) {
-    let len = input.len();
-    let half_len = len / 2;
-    assert_eq!(half_len * 2, len); // perfect split
-    (&input[..half_len], &input[half_len..])
 }
 
 #[cfg(test)]
